@@ -12,7 +12,7 @@ let {
 } = Object;
 let { isArray } = Array;
 
-let cache = new WeakMap();
+let cache = new WeakSet();
 
 let preimplemented = deepFreezeRecord_ && isDeepRecord_;
 
@@ -32,9 +32,7 @@ let isObjecty = (value) => {
 let validate = preimplemented
   ? null
   : (value, transfer = false, shallow = false) => {
-      if (!isObjecty(value)) return 3;
-      let cached;
-      if ((cached = cache.get(value))) return cached;
+      if (!isObjecty(value) || cache.has(value)) return 3;
 
       let obj = value;
 
@@ -49,7 +47,7 @@ let validate = preimplemented
         status &=
           (get || set ? 0 : 3) &
           (shallow
-            ? (cache.get(value) ?? !isObjecty(value))
+            ? cache.has(value) || !isObjecty(value)
               ? 3
               : 1
             : validate(value, transfer));
@@ -60,7 +58,7 @@ let validate = preimplemented
         status &=
           (get || set ? 0 : 3) &
           (shallow
-            ? (cache.get(value) ?? !isObjecty(value))
+            ? cache.has(value) || !isObjecty(value)
               ? 3
               : 1
             : validate(value, transfer));
@@ -72,7 +70,7 @@ let validate = preimplemented
         }
         if (!isFrozen(obj)) freeze(obj);
         if (!shallow || status === 3) {
-          cache.set(obj, status);
+          cache.add(obj);
         }
       }
 
