@@ -45,23 +45,13 @@ let validate = preimplemented
         let desc = getOwnPropertyDescriptor(obj, name);
         let { get, set, value } = desc;
         status &=
-          (get || set ? 0 : 3) &
-          (shallow
-            ? cache.has(value) || !isObjecty(value)
-              ? 3
-              : 1
-            : validate(value, transfer));
+          (get || set ? 0 : 3) & (shallow ? 1 : validate(value, transfer));
       }
       for (let name of getOwnPropertySymbols(obj)) {
         let desc = getOwnPropertyDescriptor(obj, name);
         let { get, set, value } = desc;
         status &=
-          (get || set ? 0 : 3) &
-          (shallow
-            ? cache.has(value) || !isObjecty(value)
-              ? 3
-              : 1
-            : validate(value, transfer));
+          (get || set ? 0 : 3) & (shallow ? 1 : validate(value, transfer));
       }
 
       if (transfer) {
