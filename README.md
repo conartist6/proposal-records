@@ -1,6 +1,6 @@
 # Records
 
-This proposal is intended as a sucessor to the now-withdrawn https://github.com/tc39/proposal-record-tuple. It is seeking a champion.
+This proposal is intended as a successor to the now-withdrawn https://github.com/tc39/proposal-record-tuple. It is seeking a champion.
 
 Both proposals ultimately intend to introduce a new syntax and concept into the language: records.
 
