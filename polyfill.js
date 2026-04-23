@@ -27,13 +27,12 @@ let isObjecty = (value) => {
 };
 
 // bit 1: valid
-// bit 2: deep frozen
-// bit 3: deep valid
+// bit 2: deep valid
 
 let validate = preimplemented
   ? null
   : (value, transfer = false, shallow = false) => {
-      if (!isObjecty(value)) return 7;
+      if (!isObjecty(value)) return 3;
       let cached;
       if ((cached = cache.get(value))) return cached;
 
@@ -42,16 +41,16 @@ let validate = preimplemented
       if (!transfer && (getPrototypeOf(obj) !== null || !isFrozen(obj)))
         return 0;
 
-      let status = 7;
+      let status = 3;
 
       for (let name of getOwnPropertyNames(obj)) {
         let desc = getOwnPropertyDescriptor(obj, name);
         let { get, set, value } = desc;
         status &=
-          (get || set ? 0 : 7) &
+          (get || set ? 0 : 3) &
           (shallow
             ? (cache.get(value) ?? !isObjecty(value))
-              ? 7
+              ? 3
               : 1
             : validate(value, transfer));
       }
@@ -59,10 +58,10 @@ let validate = preimplemented
         let desc = getOwnPropertyDescriptor(obj, name);
         let { get, set, value } = desc;
         status &=
-          (get || set ? 0 : 7) &
+          (get || set ? 0 : 3) &
           (shallow
             ? (cache.get(value) ?? !isObjecty(value))
-              ? 7
+              ? 3
               : 1
             : validate(value, transfer));
       }
@@ -72,7 +71,7 @@ let validate = preimplemented
           setPrototypeOf(obj, null);
         }
         if (!isFrozen(obj)) freeze(obj);
-        if (!shallow || status === 7) {
+        if (!shallow || status === 3) {
           cache.set(obj, status);
         }
       }
@@ -84,10 +83,10 @@ let deepFreezeRecord = preimplemented
   ? deepFreezeRecord_
   : (obj) => {
       let result = validate(obj, true);
-      if (result < 7) throw new Error();
+      if (result < 3) throw new Error();
       return obj;
     };
-let isDeepRecord = preimplemented ? isDeepRecord_ : (obj) => validate(obj) >= 7;
+let isDeepRecord = preimplemented ? isDeepRecord_ : (obj) => validate(obj) >= 3;
 
 if (!isSealed(Object) && !preimplemented) {
   Object.deepFreezeRecord = deepFreezeRecord_
